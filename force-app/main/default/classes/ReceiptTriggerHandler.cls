@@ -15,21 +15,23 @@ public with sharing class ReceiptTriggerHandler extends TriggerHandler{
             }
         }
 
-        List<Contact> doctorsList = [SELECT Id, Account.Department__c, Payments_amount__c, Account.Doctor_payments_to_receive_bonus__c, (SELECT Id
-                                                                                                                                         FROM Cases
-                                                                                                                                         WHERE Id IN:listCasesIdsFromReceipts)
+        List<Contact> doctorsList = [SELECT Id, AccountId, Account.Department__c, Payments_amount__c, Account.Doctor_payments_to_receive_bonus__c, (SELECT Id
+                                                                                                                                                    FROM Cases
+                                                                                                                                                    WHERE Id IN:listCasesIdsFromReceipts)
                                      FROM Contact ];
 
         Map<Id, Contact> doctorsMap = new Map<Id, Contact>();
+        List<Id> doctorsDepartmentsIdsList = new List<Id>();
 
         for (Contact contact_i : doctorsList){
             doctorsMap.put(contact_i.Id, contact_i);
+            doctorsDepartmentsIdsList.add(contact_i.AccountId);
         }
 
-        List<AggregateResult> allDoctorsTreatmentsList = [SELECT Id, SUM(Amount_of_payments__c)amount, ContactId ctId
+        List<AggregateResult> allDoctorsTreatmentsList = [SELECT SUM(Amount_of_payments__c)amount, ContactId ctId
                                                           FROM Case 
                                                           WHERE ContactId IN:doctorsMap.keySet() AND CreatedDate = THIS_MONTH AND CreatedDate = THIS_YEAR
-                                                          GROUP BY Id, ContactId];
+                                                          GROUP BY ContactId];
 
         List<Contact> doctorIdsToUpdateList = new List<Contact>();
         //3.1
@@ -53,7 +55,29 @@ public with sharing class ReceiptTriggerHandler extends TriggerHandler{
                 }
             }
         }
-    }
 
-    //3.2
+        //3.2 
+        List<Account> departmentList = [SELECT Id, Name, (SELECT Id, Payments_amount__c, Best_doctor_of_the_month__c
+                                                          FROM Contacts)
+                                        FROM Account 
+                                        WHERE Id IN:doctorsDepartmentsIdsList];
+        System.debug('Departments list :' + departmentList);
+
+            Map<Id, Contact> doctorsToUpdateMap = new Map<Id, Contact> ();
+        
+        for (Account department_i : departmentList) {
+            Id doctorIdWithHighestPayments;
+            Decimal highestAmount = 0;
+            for (Contact contact_i : department_i.Contacts) {
+                if (contact_i.Payments_amount__c > highestAmount) {
+                    highestAmount = contact_i.Payments_amount__c;
+                    doctorIdWithHighestPayments = contact_i.Id;
+                }
+                doctorsToUpdateMap.put(contact_i.Id,(new Contact(Id=contact_i.Id, Best_doctor_of_the_month__c=false)));
+            }
+            System.debug('Department ' + department_i.Name + ' has highest payment of ' + highestAmount + ' made by doctor ' + doctorIdWithHighestPayments);
+            doctorsToUpdateMap.get(doctorIdWithHighestPayments).Best_doctor_of_the_month__c=true;
+        }
+        update doctorsToUpdateMap.values();
+    }
 }
