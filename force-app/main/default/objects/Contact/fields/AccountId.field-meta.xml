@@ -4,7 +4,7 @@
     <lookupFilter>
         <active>true</active>
         <filterItems>
-            <field>Account.Type</field>
+            <field>Account.RecordTypeId</field>
             <operation>equals</operation>
             <value>Hospital department</value>
         </filterItems>

@@ -1,0 +1,36 @@
+[
+  {
+    "Id": "0037Q00000mHsP0QAK",
+    "AccountId": null,
+    "Account": null,
+    "Payments_amount__c": null,
+    "Cases": {
+      "totalSize": 1,
+      "done": true,
+      "records": [
+        {
+          "attributes": {
+            "type": "Case",
+            "url": "/services/data/v57.0/sobjects/Case/5007Q00000P0TLnQAN"
+          },
+          "Id": "5007Q00000P0TLnQAN",
+          "Amount_of_payments__c": 150
+        }
+      ]
+    }
+  },
+  {
+    "Id": "0037Q00000mHsOzQAK",
+    "AccountId": "0017Q00000ylH4GQAU",
+    "Account": {
+      "attributes": {
+        "type": "Account",
+        "url": "/services/data/v57.0/sobjects/Account/0017Q00000ylH4GQAU"
+      },
+      "Department__c": "Psychiatric",
+      "Doctor_payments_to_receive_bonus__c": 100
+    },
+    "Payments_amount__c": null,
+    "Cases": null
+  }
+]

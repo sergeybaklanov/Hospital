@@ -3,6 +3,8 @@
 //     query text and running the command:
 //     SFDX: Execute SOQL Query with Currently Selected Text
 
-SELECT MAX(Payments_amount__c), Account.Id, Account.Name FROM Contact GROUP BY Account.Id
-
-
+//SELECT Amount__c, Treatment__c, Treatment__r.Amount_of_payments__c FROM Receipt__c  GROUP BY Treatment__c
+SELECT Id, AccountId, Account.Department__c, Payments_amount__c, Account.Doctor_payments_to_receive_bonus__c,
+        (SELECT Id, Amount_of_payments__c   
+         FROM Cases)
+FROM Contact 
