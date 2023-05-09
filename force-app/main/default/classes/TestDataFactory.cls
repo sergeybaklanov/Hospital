@@ -23,7 +23,7 @@ public with sharing class TestDataFactory{
         return hospitalDepartmentList;
     }
 
-    public static List<InsuranceCompany__c> createInsurenceCompanyList(Integer amount, Boolean doInsert){
+    public static List<InsuranceCompany__c> createInsuranceCompanyList(Integer amount, Boolean doInsert){
         List<InsuranceCompany__c> insuranceCompaniesList = new List<InsuranceCompany__c>();
         for (Integer i = 0; i < amount; i++){
             insuranceCompaniesList.add(new InsuranceCompany__c(Name = 'Insurance company ' + i));
@@ -60,12 +60,12 @@ public with sharing class TestDataFactory{
         return patientList;
     }
 
-    public static List<Insurance__c> createInsuranceList(Integer amount, Decimal insuranceAmount, List<InsuranceCompany__c> isuranceCompanyList, List<Patient__c> patientList, Boolean doInsert){
+    public static List<Insurance__c> createInsuranceList(Integer amount, Decimal insuranceAmount, List<InsuranceCompany__c> insuranceCompanyList, List<Patient__c> patientList, Boolean doInsert){
         List<Insurance__c> insuranceList = new List<Insurance__c>();
         for (Integer i = 0; i < amount; i++){
-            for (Integer j = 0; j < isuranceCompanyList.size(); j++){
+            for (Integer j = 0; j < insuranceCompanyList.size(); j++){
                 for (Integer k = 0; k < patientList.size(); k++){
-                    insuranceList.add(new Insurance__c(Amount__c = insuranceAmount, Department_type__c = 'Adult', Covered_departments__c = 'Therapy', InsuranceCompany__c = isuranceCompanyList[j].Id, Patient__c = patientList[k].Id));
+                    insuranceList.add(new Insurance__c(Amount__c = insuranceAmount, Department_type__c = 'Adult', Covered_departments__c = 'Therapy', InsuranceCompany__c = insuranceCompanyList[j].Id, Patient__c = patientList[k].Id));
                 }
 
             }
@@ -95,13 +95,13 @@ public with sharing class TestDataFactory{
         return treatmentList;
     }
 
-    public static List<Receipt__c> createReceiptsList(Integer amount, List<Case> treatmentList, List<Patient__c> patientList, List<Insurance__c> isuranceList, Boolean doInsert){
+    public static List<Receipt__c> createReceiptsList(Integer amount, List<Case> treatmentList, List<Patient__c> patientList, List<Insurance__c> insuranceList, Boolean doInsert){
         List<Receipt__c> receiptList = new List<Receipt__c>();
         for (Integer i = 0; i < amount; i++){
             for (Integer j = 0; j < treatmentList.size(); j++){
                 for (Integer k = 0; k < patientList.size(); k++){
-                    for (Integer h = 0; h < isuranceList.size(); h++){
-                        receiptList.add(new Receipt__c(Treatment__c = treatmentList[j].Id, Patient__c = patientList[k].Id, Insurance__r = isuranceList[h]));
+                    for (Integer h = 0; h < insuranceList.size(); h++){
+                        receiptList.add(new Receipt__c(Treatment__c = treatmentList[j].Id, Patient__c = patientList[k].Id, Insurance__r = insuranceList[h]));
                     }
                 }
             }

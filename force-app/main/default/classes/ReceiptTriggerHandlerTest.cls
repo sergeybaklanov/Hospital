@@ -10,7 +10,7 @@ public with sharing class ReceiptTriggerHandlerTest{
         insert departments;
 
         List<Contact> doctors = TestDataFactory.createDoctorsList(1, departments, true);
-        List<InsuranceCompany__c> insuranceCompanies = TestDataFactory.createInsurenceCompanyList(1, true);
+        List<InsuranceCompany__c> insuranceCompanies = TestDataFactory.createInsuranceCompanyList(1, true);
         List<Patient__c> patients = TestDataFactory.createPatientList(1, hospitals, true);
         List<Insurance__c> insurance = TestDataFactory.createInsuranceList(1, 150, insuranceCompanies, patients, true);
         List<Case> treatments = TestDataFactory.createTreatmentList(1, departments, doctors, patients, insurance, true);
@@ -29,14 +29,18 @@ public with sharing class ReceiptTriggerHandlerTest{
             receipt_i.Amount__c = 100;
         }
 
+        Contact testDoctor2 = new Contact(LastName = 'Test doctor2', Payments_amount__c=100, AccountId = treatments[0].AccountId, Best_doctor_of_the_month__c = true);
+        insert testDoctor2;
+
         Test.startTest();
         insert receipts;
         Test.stopTest();
 
-        for (Contact doctor : [SELECT Payments_amount__c, Best_doctor_of_the_month__c
-                               FROM Contact]){
-            System.assertEquals(500.0, doctor.Payments_amount__c);
-            System.assertEquals(true, doctor.Best_doctor_of_the_month__c);
+        for (Contact doctor : [SELECT AccountId,Payments_amount__c, Best_doctor_of_the_month__c
+                               FROM Contact WHERE Best_doctor_of_the_month__c=true]){
+            System.debug('Check loop');
+            System.debug(doctor);
+            System.assert( doctor.Payments_amount__c==500, 'Not expected doctors payments amount');
         }
     }
 

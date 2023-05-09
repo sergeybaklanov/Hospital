@@ -3,7 +3,7 @@
 // 4.2    Clear “Payments amount” and uncheck “Best doctor of the month” for all Doctor objects
 public with sharing class GreetingNotification implements Schedulable{
     public void scheduleProcess(){
-        String cronExpression = '0 0 0 L * ?'; // Schedule to run on January 1st at midnight
+        String cronExpression = '0 0 0 L * ?'; 
         System.schedule('GreetingNotification Job', cronExpression, this);
     }
 
@@ -35,7 +35,6 @@ public with sharing class GreetingNotification implements Schedulable{
             }
 
         }
-        List<Department_Type_Department__mdt> department;
         sendGreetingMessage(doctorsEmailsList);
 
 
