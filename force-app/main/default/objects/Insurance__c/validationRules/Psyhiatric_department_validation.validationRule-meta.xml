@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Psyhiatric_department_validation</fullName>
+    <active>true</active>
+    <description>The psychiatric department can be available only for department type “Adult”</description>
+    <errorConditionFormula>AND(INCLUDES(Covered_departments__c, &apos;Psychiatric&apos;), ISPICKVAL( Department_type__c , &apos;Children&apos;)  )</errorConditionFormula>
+    <errorMessage>The psychiatric department can be available only for department type “Adult”</errorMessage>
+</ValidationRule>
