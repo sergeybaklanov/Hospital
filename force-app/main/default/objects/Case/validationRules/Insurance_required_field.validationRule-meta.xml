@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Insurance_required_field</fullName>
+    <active>true</active>
+    <description>(Reference to Insurance) – required field when the checkbox “By insurance” is checked</description>
+    <errorConditionFormula>AND(By_insurance__c == true ,  Insurance__c == &apos;&apos;)</errorConditionFormula>
+    <errorDisplayField>Insurance__c</errorDisplayField>
+    <errorMessage>Insurance – required field when the checkbox “By insurance” is checked</errorMessage>
+</ValidationRule>
