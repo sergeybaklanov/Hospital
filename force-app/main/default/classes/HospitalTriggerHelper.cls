@@ -1,41 +1,42 @@
 public with sharing class HospitalTriggerHelper extends TriggerHandler{
     protected override void afterInsert(){
-        System.debug('Trigger on insert Account');
-        addUsers((List<Account>)Trigger.new );
+        addUsers((Map<Id, Account>)Trigger.newMap);
     }
 
-    private static void addUsers(List<Account> newAccountsList){
-        List<Id> hospitalIdsToProcessList = new List<Id>();
-        for (Account account_i : newAccountsList){
-            if (account_i.RecordType.Name == 'Hospital'){
-                hospitalIdsToProcessList.add(account_i.Id);
-            }
-        }
-        generateUsers(hospitalIdsToProcessList);
+    private static void addUsers(Map<Id, Account> newAccountsMap){
+        generateUsers(newAccountsMap.keySet());
     }
 
     @Future(callout = true)
-    public static void generateUsers(List<Id> newHospitalsList){
-
-        final Integer NUM_USERS = 1;
-
+    public static void generateUsers(Set<Id> newHospitalsList){
+        Randomuser_Site__c site = RandomUser_Site__c.getInstance();
+        final Integer NUM_PATIENTS = 2;
         Http http = new Http();
         HttpRequest request = new HttpRequest();
-        Randomuser_Site__c site = RandomUser_Site__c.getInstance();
-        
-        String endpoint = 'https://randomapi.com/api/' + site.RefID__c + '?key=' + site.Key__c + '&results=' + NUM_USERS;
-        System.debug('endpoint: ' + endpoint);
+
+        String endpoint = 'https://randomapi.com/api/' + site.RefID__c + '?key=' + site.Key__c + '&results=' + NUM_PATIENTS;
         request.setEndpoint(endpoint);
         request.setMethod('GET');
-        System.debug('request: ' + request);
-        HttpResponse response = http.send(request);
-        System.debug(response.getStatusCode());
 
-        if (response.getStatusCode() == 200){
-            Map<String, Object> result = (Map<String, Object>)JSON.deserializeUntyped(response.getBody());
-        } else{
-            System.debug('Callout failed with status code ' + response.getStatusCode() + ': ' + response.getStatus());
+        List<Patient__c> newPatientsList = new List<Patient__c>();
+        for (Id hospitalId_i : newHospitalsList){
+            HttpResponse response = http.send(request);
+            System.debug('response.getStatusCode() : ' + response.getStatusCode());
+            if (response.getStatusCode() == 200){
+                Map<String, Object> result = (Map<String, Object>)JSON.deserializeUntyped(response.getBody());
+                System.debug(result);
+                List<Object> objectsList = (list<Object>)result.get('results');
+                for (Object res_i : objectsList){
+                    Map<String, Object> user = (Map<String, Object>)res_i;
+                    String[] userName = ((String) user.get('name')).split(' ');
+                    newPatientsList.add(new Patient__c(Hospital__c = hospitalId_i, First_Name__c = userName[0], Last_Name__c = userName[1], Birthday_date__c = Date.valueOf((String) user.get('date'))));
+                }
+            } else{
+                System.debug('Callout failed with status code ' + response.getStatusCode() + ': ' + response.getStatus());
+            }
         }
+        System.debug('newPatientsList: ' + newPatientsList);
+        Database.insert (newPatientsList, true);
     }
 
 }
