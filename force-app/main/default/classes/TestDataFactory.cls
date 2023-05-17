@@ -101,7 +101,7 @@ public with sharing class TestDataFactory{
             for (Integer j = 0; j < treatmentList.size(); j++){
                 for (Integer k = 0; k < patientList.size(); k++){
                     for (Integer h = 0; h < insuranceList.size(); h++){
-                        receiptList.add(new Receipt__c(Treatment__c = treatmentList[j].Id, Patient__c = patientList[k].Id, Insurance__r = insuranceList[h]));
+                        receiptList.add(new Receipt__c(Treatment__c = treatmentList[j].Id, Patient__c = patientList[k].Id, Insurance__c = insuranceList[h].Id));
                     }
                 }
             }

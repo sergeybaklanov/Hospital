@@ -1,10 +1,57 @@
 // 3.    When Amount of Receipt object is changed
 // 3.1    Check sum of “Amount of payments” of all Cases related to current doctor in current month– if received sum is more than “Doctor payments to receive bonus” field value from Hospital department – update field “Payments amount” on Doctor object with received value
 // 3.2    Check the doctors related to the same department with populated “Payments amount” field and set the flag “Best doctor of the month” on object with the higher value. NOTE: There can be only one Best doctor for each hospital department.
+//9.    When Receipt is saved – update Insurance Covered amount (must be sum of all receipts of current month). Balance field on Insurance must be only positive and if it becomes negative – don’t save the Receipt and show Error message – “Insurance have not enough amount for coverage – chose another one or clear this field.”
 public with sharing class ReceiptTriggerHandler extends TriggerHandler{
+    protected override void beforeInsert(){
+        updateInsuranceCoveredAmount((List<Receipt__c>)Trigger.new );
+    }
+
     protected override void afterInsert(){
         updateTreatmentPaymentsAmount((Map<Id, Receipt__c>)Trigger.newMap);
         updateDoctorsPaymentsAmount((Map<Id, Receipt__c>)Trigger.newMap);
+    }
+
+    private static void updateInsuranceCoveredAmount(List<Receipt__c> newReceiptsList){
+
+        Set<Id> insuranceIdsSet = new Set<Id>();
+        for (Receipt__c receipt_i : newReceiptsList){
+
+            insuranceIdsSet.add(receipt_i.Insurance__c);
+        }
+        //Alternative variant
+        // List<AggregateResult> sumOfExistReceiptsToInsuranceList = [SELECT SUM(Amount__c)sumAmount, Insurance__c insId
+        //                                                            FROM Receipt__c
+        //                                                            WHERE Insurance__c  IN:insuranceIdsSet AND CreatedDate = THIS_MONTH
+        //                                                            GROUP BY Insurance__c ];
+
+
+        // Map<Id,Decimal> insuranceIdCoveredAmountMap = new Map<Id,Decimal> ();
+
+        // for (AggregateResult result_i : sumOfExistReceiptsToInsuranceList){
+        //     insuranceIdCoveredAmountMap.put((Id)result_i.get('insId'), (Decimal)result_i.get('sumAmount'));
+        // }
+
+        List<Insurance__c> insuranceList = [SELECT Id, Amount__c, (SELECT Amount__c
+                                                                   FROM Receipts__r
+                                                                   WHERE CreatedDate = THIS_MONTH)
+                                            FROM Insurance__c 
+                                            WHERE Id IN:insuranceIdsSet];
+
+        Map<Id, Decimal> insuranceIdAmountBalanceMap = new Map<Id, Decimal>();
+        for (Insurance__c insurance_i : insuranceList){
+            Decimal sumExistAmount = 0;
+            for (Receipt__c receipt_i : insurance_i.Receipts__r){
+                sumExistAmount += receipt_i.Amount__c;
+            }
+            insuranceIdAmountBalanceMap.put(insurance_i.Id, (insurance_i.Amount__c - sumExistAmount));
+        }
+
+        for (Receipt__c receipt_i : newReceiptsList){
+            if ((insuranceIdAmountBalanceMap.get(receipt_i.Insurance__c) - receipt_i.Amount__c) < 0){
+                receipt_i.Insurance__c.addError('Insurance have not enough amount for coverage – chose another one or clear this field.');
+            }
+        }
     }
 
     private static void updateTreatmentPaymentsAmount(Map<Id, Receipt__c> newReceiptsMap){
