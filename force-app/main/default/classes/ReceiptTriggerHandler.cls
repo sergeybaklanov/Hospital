@@ -59,14 +59,12 @@ public with sharing class ReceiptTriggerHandler extends TriggerHandler{
                                                  FROM Receipts__r
                                                  WHERE Id IN:newReceiptsMap.keySet())
                                      FROM Case ];
-        List<Id> treatmentIdsList = new List<Id>();
-        for (Case treatment_i : treatmentsList){
-            treatmentIdsList.add(treatment_i.Id);
-        }
+
+        Map<Id, Case> treatmentMap = new Map<Id, Case>(treatmentsList);
 
         List<AggregateResult> treatmentReceiptsList = [SELECT SUM(Amount__c)Amount, Treatment__c TrId
                                                        FROM Receipt__c 
-                                                       WHERE Treatment__c IN:treatmentIdsList
+                                                       WHERE Treatment__c IN:treatmentMap.keySet()
                                                        GROUP BY Treatment__c];
 
         List<Case> treatmentsToUpdateList = new List<Case>();
@@ -125,13 +123,9 @@ public with sharing class ReceiptTriggerHandler extends TriggerHandler{
         List<Contact> finalDoctorsUpdateList = new List<Contact>();
 
         for (Account department_i : departmentsList){
-            for (Integer i = 0; i < department_i.Contacts.size(); i++){
-                if (i == 0){
-                    continue;
-                } else{
-                    department_i.Contacts[i].Best_doctor_of_the_month__c = false;
-                    finalDoctorsUpdateList.add(department_i.Contacts[i]);
-                }
+            for (Integer i = 1; i < department_i.Contacts.size(); i++){
+                department_i.Contacts[i].Best_doctor_of_the_month__c = false;
+                finalDoctorsUpdateList.add(department_i.Contacts[i]);
             }
         }
 
