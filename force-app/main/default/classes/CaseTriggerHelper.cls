@@ -39,25 +39,24 @@ public with sharing class CaseTriggerHelper extends TriggerHandler{
 
     private static void validatePopulatedInsurance(List<Case> newTreatmentList){
         Set<Id> insuranceIdsSet = new Set<Id>();
-        Set<Id> hospitalDepartmentSet = new Set<Id> ();
+        Set<Id> hospitalDepartmentSet = new Set<Id>();
         for (Case treatment_i : newTreatmentList){
             insuranceIdsSet.add(treatment_i.Insurance__c);
             hospitalDepartmentSet.add(treatment_i.AccountId);
         }
-        List<Insurance__c> insuranceList = [SELECT Id, Covered_departments__c, Department_type__c
-                                            FROM Insurance__c
-                                            WHERE Id IN:insuranceIdsSet];
-        Map<Id, Insurance__c> insuranceMap = new Map<Id, Insurance__c>(insuranceList);
+        Map<Id, Insurance__c> insuranceMap = new Map<Id, Insurance__c>([SELECT Id, Covered_departments__c, Department_type__c
+                                                                        FROM Insurance__c
+                                                                        WHERE Id IN:insuranceIdsSet]);
 
         List<Account> hospitalDepartmentsList = [SELECT Id, Department__c, Department_type__c
                                                  FROM Account
-                                                 WHERE Id IN :hospitalDepartmentSet];
-        Map<Id,Account> departmentMap = new Map<Id,Account> (hospitalDepartmentsList);
+                                                 WHERE Id IN:hospitalDepartmentSet];
+        Map<Id, Account> departmentMap = new Map<Id, Account>(hospitalDepartmentsList);
         for (Case treatment_i : newTreatmentList){
-            if(!insuranceMap.get(treatment_i.Insurance__c).Covered_departments__c.contains(departmentMap.get(treatment_i.AccountId).Department__c)||
-            insuranceMap.get(treatment_i.Insurance__c).Department_type__c!=departmentMap.get(treatment_i.AccountId).Department_type__c){
+            if (!insuranceMap.get(treatment_i.Insurance__c).Covered_departments__c.contains(departmentMap.get(treatment_i.AccountId).Department__c) || insuranceMap.get(treatment_i.Insurance__c).Department_type__c != departmentMap.get(treatment_i.AccountId).Department_type__c){
                 treatment_i.Insurance__c.addError('Insurance not covered this department or department type');
             }
         }
     }
+
 }
