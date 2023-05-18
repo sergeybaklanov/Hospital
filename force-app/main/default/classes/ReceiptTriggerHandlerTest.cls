@@ -94,11 +94,11 @@ public with sharing class ReceiptTriggerHandlerTest{
         insert receipts;
         Test.stopTest();
 
-        for (Contact doctor : [SELECT AccountId, Payments_amount__c, Best_doctor_of_the_month__c
-                               FROM Contact
-                               WHERE Best_doctor_of_the_month__c = true]){
-            System.assert(doctor.Payments_amount__c == 500, 'Not expected doctors payments amount');
-        }
+        List<Contact> doctors = [SELECT AccountId, Payments_amount__c, Best_doctor_of_the_month__c
+                                 FROM Contact
+                                 WHERE Best_doctor_of_the_month__c = true];
+
+        System.assert(doctors[0].Payments_amount__c == 500, 'Not expected doctors payments amount');
     }
 
 }
