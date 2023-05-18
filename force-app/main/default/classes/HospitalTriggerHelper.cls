@@ -29,7 +29,11 @@ public with sharing class HospitalTriggerHelper extends TriggerHandler{
                 for (Object res_i : objectsList){
                     Map<String, Object> user = (Map<String, Object>)res_i;
                     String[] userName = ((String) user.get('name')).split(' ');
-                    newPatientsList.add(new Patient__c(Hospital__c = hospitalId_i, First_Name__c = userName[0], Last_Name__c = userName[1], Birthday_date__c = Date.valueOf((String) user.get('date'))));
+                    String [] userBirthDate = ((String)user.get('date')).split('-');
+                    Integer year = Integer.valueOf(userBirthDate[0]);
+                    Integer month = Integer.valueOf(userBirthDate[1]);
+                    Integer day = Integer.valueOf(userBirthDate[2]);
+                    newPatientsList.add(new Patient__c(Hospital__c = hospitalId_i, First_Name__c = userName[0], Last_Name__c = userName[1], Birthday_date__c = Date.newInstance(year, month, day)));
                 }
             } else{
                 System.debug('Callout failed with status code ' + response.getStatusCode() + ': ' + response.getStatus());
