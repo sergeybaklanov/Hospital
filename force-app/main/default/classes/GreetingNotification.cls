@@ -18,8 +18,6 @@ public with sharing class GreetingNotification implements Schedulable{
 
         List<String> doctorsEmailsList = new List<String>();
 
-        List<Department_Type_Department__mdt> departmentMetadata = Department_Type_Department__mdt.getAll().values();
-
         List<Task> bonusPaymentsTask = new List<Task>();
 
         for (Contact doctor_i : bestDoctorsOfMonthList){
@@ -38,10 +36,10 @@ public with sharing class GreetingNotification implements Schedulable{
         sendGreetingMessage(doctorsEmailsList);
 
 
-        Database.SaveResult[] results = Database.insert (bonusPaymentsTask, true);
+Database.insert (bonusPaymentsTask, true);
 
         ClearAllDoctorsFieldBatch batch = new ClearAllDoctorsFieldBatch();
-        Id batchId = Database.executeBatch(batch);
+        Database.executeBatch(batch);
     }
 
     @future(callout = true)
