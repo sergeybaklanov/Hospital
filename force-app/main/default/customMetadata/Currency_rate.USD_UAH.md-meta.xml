@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>USD_UAH</label>
+    <protected>false</protected>
+    <values>
+        <field>base_ccy__c</field>
+        <value xsi:type="xsd:string">UAH</value>
+    </values>
+    <values>
+        <field>buy__c</field>
+        <value xsi:type="xsd:double">37.0</value>
+    </values>
+    <values>
+        <field>ccy__c</field>
+        <value xsi:type="xsd:string">USD</value>
+    </values>
+    <values>
+        <field>sale__c</field>
+        <value xsi:type="xsd:double">37.5</value>
+    </values>
+</CustomMetadata>

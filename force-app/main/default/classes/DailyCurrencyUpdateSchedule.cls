@@ -21,7 +21,6 @@ public with sharing class DailyCurrencyUpdateSchedule implements Schedulable{
             Map<String, Rate_currency__c> currencyRateMap =Rate_currency__c.getAll(); 
 
             for (CurrencyWrapper res_i : results){
-                String fullName = 'Currency_rate.' + res_i.ccy + '_' + res_i.base_ccy;
                 String label = res_i.ccy + '-' + res_i.base_ccy;
                 currencyRateMap.get(label).buy__c = res_i.buy;
                 currencyRateMap.get(label).sale__c = res_i.sale;
