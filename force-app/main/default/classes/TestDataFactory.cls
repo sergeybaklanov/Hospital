@@ -1,10 +1,8 @@
 public with sharing class TestDataFactory{
     public static List<Account> createHospitalsList(Integer amount, Boolean doInsert){
-        Id hospitalRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByName().get('Hospital').getRecordTypeId();
         List<Account> hospitalList = new List<Account>();
         for (Integer i = 0; i < amount; i++){
-            hospitalList.add(new Account(Name = 'Test Hospital' + i, RecordTypeId = hospitalRecordTypeId));
-            
+            hospitalList.add(new Account(Name = 'Test Hospital' + i));
         }
         if (doInsert){
             insert hospitalList;
