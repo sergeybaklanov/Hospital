@@ -18,31 +18,15 @@ public with sharing class DailyCurrencyUpdateSchedule implements Schedulable{
             List<CurrencyWrapper> results = (List<CurrencyWrapper>)JSON.deserialize(response.getBody(), List<CurrencyWrapper>.class);
             System.debug('Results: ' + results);
 
-            List<Metadata.CustomMetadata> customMetadataList = new List<Metadata.CustomMetadata>();
+            Map<String, Rate_currency__c> currencyRateMap =Rate_currency__c.getAll(); 
 
             for (CurrencyWrapper res_i : results){
                 String fullName = 'Currency_rate.' + res_i.ccy + '_' + res_i.base_ccy;
-                String label = res_i.ccy + '_' + res_i.base_ccy;
-
-                Metadata.CustomMetadata customMetadata = new Metadata.CustomMetadata();
-                customMetadata.fullName = fullName;
-                customMetadata.label = label;
-
-                Map<String, Object> fieldWithValuesMap = new Map<String, Object>();
-                fieldWithValuesMap.put('buy__c', res_i.buy);
-                fieldWithValuesMap.put('sale__c', res_i.sale);
-
-                for (String key : fieldWithValuesMap.keySet()){
-                    Metadata.CustomMetadataValue customField = new Metadata.CustomMetadataValue();
-                    customField.field = key;
-                    customField.value = fieldWithValuesMap.get(key);
-                    customMetadata.values.add(customField);
-                }
-
-                customMetadataList.add(customMetadata);
+                String label = res_i.ccy + '-' + res_i.base_ccy;
+                currencyRateMap.get(label).buy__c = res_i.buy;
+                currencyRateMap.get(label).sale__c = res_i.sale;
             }
-
-            CreateUpdateMetadataUtils.createUpdateMetadata(customMetadataList);
+            update currencyRateMap.values();
         }
     }
 
