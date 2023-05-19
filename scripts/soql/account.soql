@@ -3,4 +3,6 @@
 //     query text and running the command:
 //     SFDX: Execute SOQL Query with Currently Selected Text
 
-SELECT Id, Name FROM Account
+SELECT MAX(Payments_amount__c), Account.Id, Account.Name FROM Contact GROUP BY Account.Id
+
+
